@@ -16,9 +16,9 @@ static SCPA_MM_ENTRY *generic_next(SCPA_MM_ITERATOR *this) {
     }
 
     if (fscanf(this->file, "%d %d %lg", &entry->coordx, &entry->coordy, &entry->value) != 3) {
-        errno = EBADF ;
-        free(entry) ;
-        return NULL ;
+        errno ;
+        entry->coordx = -1 ;
+        return entry ;
     }
 
     return entry ;
