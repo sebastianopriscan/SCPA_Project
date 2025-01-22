@@ -16,7 +16,6 @@ static SCPA_MM_ENTRY *generic_next(SCPA_MM_ITERATOR *this) {
     }
 
     if (fscanf(this->file, "%d %d %lg", &entry->coordx, &entry->coordy, &entry->value) != 3) {
-        errno ;
         entry->coordx = -1 ;
         return entry ;
     }
@@ -33,16 +32,20 @@ static SCPA_MM_ENTRY *symmetric_next(SCPA_MM_ITERATOR *this) {
     if (((SYMMETRY_STATE *)(this->state))->symmetry) {
         ((SYMMETRY_STATE *)(this->state))->symmetry = 0 ;
         memcpy(entry, &((SYMMETRY_STATE *)(this->state))->last_read, sizeof(SCPA_MM_ENTRY)) ;
+        int temp = entry->coordx ;
+        entry->coordx = entry->coordy ;
+        entry->coordy = temp ;
         return entry ;
     } else {
         if (fscanf(this->file, "%d %d %lg", &entry->coordx, &entry->coordy, &entry->value) != 3) {
-            errno = EBADF ;
-            free(entry) ;
-            return NULL ;
+            entry->coordx = -1 ;
+            return entry ;
         }
 
-        ((SYMMETRY_STATE *)(this->state))->symmetry = 1 ;
-        memcpy(&((SYMMETRY_STATE *)(this->state))->last_read, entry, sizeof(SCPA_MM_ENTRY)) ;
+        if (entry->coordx != entry->coordy) {
+            ((SYMMETRY_STATE *)(this->state))->symmetry = 1 ;
+            memcpy(&((SYMMETRY_STATE *)(this->state))->last_read, entry, sizeof(SCPA_MM_ENTRY)) ;
+        }
     }
 
     return entry ;
@@ -58,19 +61,39 @@ static SCPA_MM_ENTRY *skew_next(SCPA_MM_ITERATOR *this) {
         ((SYMMETRY_STATE *)(this->state))->symmetry = 0 ;
         memcpy(entry, &((SYMMETRY_STATE *)(this->state))->last_read, sizeof(SCPA_MM_ENTRY)) ;
         entry->value = -entry->value ;
+        int temp = entry->coordx ;
+        entry->coordx = entry->coordy ;
+        entry->coordy = temp ;
         return entry ;
     } else {
         if (fscanf(this->file, "%d %d %lg", &entry->coordx, &entry->coordy, &entry->value) != 3) {
-            errno = EBADF ;
-            free(entry) ;
-            return NULL ;
+            entry->coordx = -1 ;
+            return entry ;
         }
 
-        ((SYMMETRY_STATE *)(this->state))->symmetry = 1 ;
-        memcpy(&((SYMMETRY_STATE *)(this->state))->last_read, entry, sizeof(SCPA_MM_ENTRY)) ;
+        if (entry->coordx != entry->coordy) {
+            ((SYMMETRY_STATE *)(this->state))->symmetry = 1 ;
+            memcpy(&((SYMMETRY_STATE *)(this->state))->last_read, entry, sizeof(SCPA_MM_ENTRY)) ;
+        }
     }
 
     return entry ;
+}
+
+static int readNzs(FILE *file) {
+    int nzs = 0 ;
+    int row, col ;
+    double dummy ;
+    MM_typecode matcode ;
+
+    while(fscanf(file, "%d %d %lg", &row, &col, &dummy) == 3)
+        nzs += row != col ? 2 : 1 ;
+    
+    fseek(file, 0, SEEK_SET) ;
+    mm_read_banner(file, &matcode) ;
+    mm_read_mtx_crd_size(file, &row, &col, &col) ;
+
+    return nzs ;
 }
 
 SCPA_MM_ITERATOR *SCPA_MM_ITERATOR_Create(IN FILE *file) {
@@ -97,15 +120,17 @@ SCPA_MM_ITERATOR *SCPA_MM_ITERATOR_Create(IN FILE *file) {
         free(iterator) ;
         return NULL ;
     }
-    iterator->state = iterator + sizeof(SCPA_MM_ITERATOR) ;
+    iterator->state = (void *)iterator + sizeof(SCPA_MM_ITERATOR) ;
     ((SYMMETRY_STATE *)(iterator->state))->symmetry = 0 ;
 
 
     switch(matcode[3]) {
         case 'K' :
+            iterator->nz = readNzs(file) ;
             iterator->next = skew_next ;
             break ;
         case 'S' :
+            iterator->nz = readNzs(file) ;
             iterator->next = symmetric_next ;
             break ;
         case 'G' :
