@@ -14,23 +14,21 @@ struct _CSR_LOADER_DATA {
 } ;
 typedef struct _CSR_LOADER_DATA CSR_LOADER_DATA ;
 
-int correctRowIndexes[7] = {0, 1, 2, 2, 3, 4, 5} ;
-int correctColIndexes[6] = {4,5,6,0,1,3} ;
-double correctnzs[6] = {0.433, 2.16, -8.43, -0.433, -2.16, 8.43} ;
-
-int nzNum = 6 ;
+int correctRowIndexes[5] = {0,2,3,4,7} ;
+int correctColIndexes[8] = {0,3,1,2,1,3,4,4} ;
+double correctnzs[8] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0} ;
 
 CSR_LOADER_DATA correct = {
     .rowIdxs = correctRowIndexes,
     .colIdxs = correctColIndexes,
     .nzs = correctnzs,
-    .rows = 7, .cols = 7
+    .rows = 5, .cols = 5
 } ;
 
 char buf[4096] ;
 
 int main(void) {
-    FILE *file = fopen("./resources/skew_matrix.mm", "r") ;
+    FILE *file = fopen("./resources/pattern_matrix.mm", "r") ;
     SCPA_MMLOADER loader ;
     if (file == NULL) {
         perror("Error opening file: ") ;
@@ -43,10 +41,10 @@ int main(void) {
 
     CSR_LOADER_DATA *cast = as_impl_data(loader.data) ;
 
-    for (int i = 0 ; i < correct.rows ; i++)
+    for (int i = 0 ; i < 5 ; i++)
         if (cast->rowIdxs[i] != correct.rowIdxs[i]) return -1 ;
 
-    for (int i = 0; i < nzNum ; i++) {
+    for (int i = 0; i < 8 ; i++) {
         if (cast->colIdxs[i] != correct.colIdxs[i]) return -1 ;
         if (fabs(correct.nzs[i] - cast->nzs[i]) > 0.01) return -1 ;
     }

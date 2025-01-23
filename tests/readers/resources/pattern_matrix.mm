@@ -1,4 +1,4 @@
-%%MatrixMarket matrix coordinate real skew-symmetric
+%%MatrixMarket matrix coordinate pattern general
 %=================================================================================
 %
 % This ASCII file represents a sparse MxN matrix with L 
@@ -19,18 +19,13 @@
 %
 % Indices are 1-based, i.e. A(1,1) is the first element.
 %
-% In this example the sparse matrix is the following :
-% 
-%     0       0       0        0       0.433    0       0     
-%     0       0       0        0       0        2.16    0
-%     0       0       0        0       0        0       0
-%     0       0       0        0       0        0       -8.43
-%     -0.433  0       0        0       0        0       0
-%     0       -2.16   0        0       0        0       0
-%     0       0       0        8.43    0        0       0    
-%
 %=================================================================================
-  7  7  3
-    7     4   8.430e+00
-    5     1  -4.330e-01
-    6     2  -2.160e+00
+  5  5  8
+    1     1  
+    2     2  
+    3     3  
+    1     4  
+    4     2  
+    4     4  
+    4     5  
+    5     5  
