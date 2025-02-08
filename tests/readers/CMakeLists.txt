@@ -1,25 +1,48 @@
 
-add_executable(TestNormalMMReader testNormalMMreader.c)
+add_executable(TestNormalMMCSRReader testNormalMMCSRreader.c)
+
+target_link_libraries(TestNormalMMCSRReader CSRDirectLoader)
+add_test(TestNormalMMCSRReader TestNormalMMCSRReader)
+
+add_executable(TestNormalMMHLLReader testNormalMMHLLreader.c)
+
+target_link_libraries(TestNormalMMHLLReader HLLDirectLoader)
+add_test(TestNormalMMHLLReader TestNormalMMHLLReader)
+
 configure_file(resources/matrix.mm resources/matrix.mm)
 
-target_link_libraries(TestNormalMMReader CSRDirectLoader)
-add_test(TestNormalMMReader TestNormalMMReader)
+add_executable(TestSymmetricMMCSRReader testSymmetricMMCSRreader.c)
 
-add_executable(TestSymmetricMMReader testSymmetricMMreader.c)
+target_link_libraries(TestSymmetricMMCSRReader CSRDirectLoader)
+add_test(TestSymmetricMMCSRReader TestSymmetricMMCSRReader)
+
+add_executable(TestSymmetricMMHLLReader testSymmetricMMHLLreader.c)
+
+target_link_libraries(TestSymmetricMMHLLReader HLLDirectLoader)
+add_test(TestSymmetricMMHLLReader TestSymmetricMMHLLReader)
+
 configure_file(resources/symm_matrix.mm resources/symm_matrix.mm)
 
-target_link_libraries(TestSymmetricMMReader CSRDirectLoader)
-add_test(TestSymmetricMMReader TestSymmetricMMReader)
+add_executable(TestSkewMMCSRReader testSkewMMCSRreader.c)
 
+target_link_libraries(TestSkewMMCSRReader CSRDirectLoader)
+add_test(TestSkewMMCSRReader TestSkewMMCSRReader)
 
-add_executable(TestSkewMMReader testSkewMMreader.c)
+add_executable(TestSkewMMHLLReader testSkewMMHLLreader.c)
+
+target_link_libraries(TestSkewMMHLLReader HLLDirectLoader)
+add_test(TestSkewMMHLLReader TestSkewMMHLLReader)
+
 configure_file(resources/skew_matrix.mm resources/skew_matrix.mm)
 
-target_link_libraries(TestSkewMMReader CSRDirectLoader)
-add_test(TestSkewMMReader TestSkewMMReader)
+add_executable(TestPatternMMCSRReader testPatternMMCSRreader.c)
 
-add_executable(TestPatternMMReader testPatternMMreader.c)
+target_link_libraries(TestPatternMMCSRReader CSRDirectLoader)
+add_test(TestPatternMMCSRReader TestPatternMMCSRReader)
+
+add_executable(TestPatternMMHLLReader testPatternMMHLLreader.c)
+
+target_link_libraries(TestPatternMMHLLReader HLLDirectLoader)
+add_test(TestPatternMMHLLReader TestPatternMMHLLReader)
+
 configure_file(resources/pattern_matrix.mm resources/pattern_matrix.mm)
-
-target_link_libraries(TestPatternMMReader CSRDirectLoader)
-add_test(TestPatternMMReader TestPatternMMReader)

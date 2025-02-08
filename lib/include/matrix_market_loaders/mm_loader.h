@@ -15,7 +15,10 @@ typedef struct _SCPA_MMLOADER {
 
 } SCPA_MMLOADER ;
 
-int SCPA_CSR_DIRECT_LOADER_Init(FILE *file, SCPA_MMLOADER *out) ;
-int SCPA_CSR_DIRECT_LOADER_Destroy(SCPA_MMLOADER *loader) ;
+int SCPA_CSR_DIRECT_LOADER_Init(IN FILE *file, OUT SCPA_MMLOADER *out) ;
+int SCPA_CSR_DIRECT_LOADER_Destroy(IN SCPA_MMLOADER *loader) ;
+
+int SCPA_HLL_DIRECT_LOADER_Init(IN FILE *file, OUT SCPA_MMLOADER *out, int hackSize) ;
+int SCPA_HLL_DIRECT_LOADER_Destroy(IN SCPA_MMLOADER *loader) ;
 
 #endif

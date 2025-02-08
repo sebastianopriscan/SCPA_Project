@@ -170,6 +170,14 @@ static int readNzs(FILE *file) {
     return nzs ;
 }
 
+void SCPA_MM_ITERATOR_Reset(IN SCPA_MM_ITERATOR *iterator) {
+    int row, col ;
+    MM_typecode matcode ;
+    fseek(iterator->file, 0, SEEK_SET) ;
+    mm_read_banner(iterator->file, &matcode) ;
+    mm_read_mtx_crd_size(iterator->file, &row, &col, &col) ;
+}
+
 SCPA_MM_ITERATOR *SCPA_MM_ITERATOR_Create(IN FILE *file) {
 
     MM_typecode matcode ;
