@@ -3,27 +3,6 @@
 
 #include "matrix_market_loaders/mm_loader.h"
 
-#define as_impl_data(data) (HLL_LOADER_DATA *)(data)
-
-struct _ELL_LOADER_DATA {
-    int rows ;
-    int cols ;
-    int maxnz ;
-    int *columnMat ;
-    double *nzMat ;
-} ;
-typedef struct _ELL_LOADER_DATA ELL_LOADER_DATA ;
-
-#define ELL_LOADER_DATA_SIZE(rows, nz) (sizeof(ELL_LOADER_DATA) + sizeof(int) * rows * nz + sizeof(double) * rows * nz)
-
-struct _HLL_LOADER_DATA {
-    int hack_size ;
-    int rows ;
-    int cols ;
-    int nzs ;
-    ELL_LOADER_DATA *ellpacks ;
-} ;
-typedef struct _HLL_LOADER_DATA HLL_LOADER_DATA ;
 
 int correctColumnMat1[6] = {0,3,1,0,2,0} ;
 double correctNzMat1[6] = {1.0, 1.0, 1., 0, 1., 0} ;
@@ -60,7 +39,7 @@ char buf[4096] ;
 
 int main(void) {
     FILE *file = fopen("./resources/pattern_matrix.mm", "r") ;
-    SCPA_MMLOADER loader ;
+    SCPA_MMLOADER_HLL_LOADER_DATA loader ;
     if (file == NULL) {
         perror("Error opening file: ") ;
         return -1 ;
@@ -70,7 +49,7 @@ int main(void) {
         return -1 ;
     }
 
-    HLL_LOADER_DATA *cast = as_impl_data(loader.data) ;
+    HLL_LOADER_DATA *cast = loader.data ;
 
     if (cast->rows != correct.rows) return -1 ;
     if (cast->cols != correct.cols) return -1 ;

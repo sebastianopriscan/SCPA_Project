@@ -3,16 +3,6 @@
 
 #include "matrix_market_loaders/mm_loader.h"
 
-#define as_impl_data(data) (CSR_LOADER_DATA *)(data)
-
-
-struct _CSR_LOADER_DATA {
-    int *rowIdxs ;
-    int *colIdxs ;
-    double *nzs ;
-    int rows, cols ;
-} ;
-typedef struct _CSR_LOADER_DATA CSR_LOADER_DATA ;
 
 int correctRowIndexes[7] = {0, 1, 2, 2, 3, 4, 5} ;
 int correctColIndexes[6] = {4,5,6,0,1,3} ;
@@ -31,7 +21,7 @@ char buf[4096] ;
 
 int main(void) {
     FILE *file = fopen("./resources/skew_matrix.mm", "r") ;
-    SCPA_MMLOADER loader ;
+    SCPA_MMLOADER_CSR_LOADER_DATA loader ;
     if (file == NULL) {
         perror("Error opening file: ") ;
         return -1 ;
@@ -41,7 +31,7 @@ int main(void) {
         return -1 ;
     }
 
-    CSR_LOADER_DATA *cast = as_impl_data(loader.data) ;
+    CSR_LOADER_DATA *cast = loader.data ;
 
     for (int i = 0 ; i < correct.rows ; i++)
         if (cast->rowIdxs[i] != correct.rowIdxs[i]) return -1 ;

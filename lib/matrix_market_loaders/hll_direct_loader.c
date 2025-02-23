@@ -7,25 +7,7 @@
 
 #define as_impl_data(data) (HLL_LOADER_DATA *)(data)
 
-struct _ELL_LOADER_DATA {
-    int rows ;
-    int cols ;
-    int maxnz ;
-    int *columnMat ;
-    double *nzMat ;
-} ;
-typedef struct _ELL_LOADER_DATA ELL_LOADER_DATA ;
-
 #define ELL_LOADER_DATA_SIZE(rows, nz) (sizeof(ELL_LOADER_DATA) + sizeof(int) * (rows) * (nz) + sizeof(double) * (rows) * (nz))
-
-struct _HLL_LOADER_DATA {
-    int hack_size ;
-    int rows ;
-    int cols ;
-    int nzs ;
-    ELL_LOADER_DATA *ellpacks ;
-} ;
-typedef struct _HLL_LOADER_DATA HLL_LOADER_DATA ;
 
 struct _maxnzs {
     int size ;
@@ -143,7 +125,23 @@ static void reindex_ell_columns(HLL_LOADER_DATA *data) {
     }
 }
 
-int SCPA_HLL_DIRECT_LOADER_Init(FILE *file, SCPA_MMLOADER *out, int hackSize) {
+static double SCPA_MMLOADER_ReadAt(SCPA_MMLOADER_HLL_LOADER_DATA *loader, int row, int col) {
+    HLL_LOADER_DATA *data = (HLL_LOADER_DATA *) loader->data ;
+
+    int ell_row = row % data->hack_size ;
+    ELL_LOADER_DATA *ell = data->ellpacks + (row / data->hack_size) ;
+
+    for (int i = 0; i < ell->maxnz; i++) {
+        double nz = ell->nzMat[ell_row * ell->maxnz + i] ;
+        if (nz == 0.) return 0.;
+
+        if (col == ell->columnMat[ell_row * ell->maxnz + i]) return nz ;
+    }
+
+    return 0. ;
+}
+
+int SCPA_HLL_DIRECT_LOADER_Init(FILE *file, SCPA_MMLOADER_HLL_LOADER_DATA *out, int hackSize) {
 
     SCPA_MM_ITERATOR *iterator = SCPA_MM_ITERATOR_Create(file) ;
     if(iterator == NULL) {
@@ -210,9 +208,11 @@ int SCPA_HLL_DIRECT_LOADER_Init(FILE *file, SCPA_MMLOADER *out, int hackSize) {
 
     reindex_ell_columns(data) ;
 
+    out->SCPA_MMLOADER_ReadAt = SCPA_MMLOADER_ReadAt ;
+
     return 0 ;
 }
 
-int SCPA_HLL_DIRECT_LOADER_Destroy(SCPA_MMLOADER *loader) {
+int SCPA_HLL_DIRECT_LOADER_Destroy(SCPA_MMLOADER_HLL_LOADER_DATA *loader) {
 
 }

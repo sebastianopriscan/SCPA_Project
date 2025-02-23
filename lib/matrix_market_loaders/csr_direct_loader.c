@@ -7,13 +7,6 @@
 
 #define as_impl_data(data) (CSR_LOADER_DATA *)(data)
 
-struct _CSR_LOADER_DATA {
-    int *rowIdxs ;
-    int *colIdxs ;
-    double *nzs ;
-    int rows, cols ;
-} ;
-typedef struct _CSR_LOADER_DATA CSR_LOADER_DATA ;
 
 //TODO : CHECK
 static inline void reshape_array(CSR_LOADER_DATA *data, int row, int col, double nz) {
@@ -59,16 +52,16 @@ static inline void reshape_array(CSR_LOADER_DATA *data, int row, int col, double
 
 }
 
-static int SCPA_MMLOADER_ReadAt(SCPA_MMLOADER *loader, int row, int col) {
+static double SCPA_MMLOADER_ReadAt(SCPA_MMLOADER_CSR_LOADER_DATA *loader, int row, int col) {
     CSR_LOADER_DATA *data = (CSR_LOADER_DATA *) loader->data ;
 
     for (int i = data->rowIdxs[row] ; i < data->rowIdxs[row+1] ; i++) 
         if (data->colIdxs[i] == col) return data->nzs[i] ;
 
-    return 0 ;
+    return 0. ;
 }
 
-int SCPA_CSR_DIRECT_LOADER_Init(FILE *file, SCPA_MMLOADER *out) {
+int SCPA_CSR_DIRECT_LOADER_Init(FILE *file, SCPA_MMLOADER_CSR_LOADER_DATA *out) {
 
     SCPA_MM_ITERATOR *iterator = SCPA_MM_ITERATOR_Create(file) ;
     if(iterator == NULL) {
@@ -120,6 +113,6 @@ int SCPA_CSR_DIRECT_LOADER_Init(FILE *file, SCPA_MMLOADER *out) {
 }
 
 
-int SCPA_CSR_DIRECT_LOADER_Destroy(SCPA_MMLOADER *loader) {
+int SCPA_CSR_DIRECT_LOADER_Destroy(SCPA_MMLOADER_CSR_LOADER_DATA *loader) {
     free(loader->data) ;
 }
