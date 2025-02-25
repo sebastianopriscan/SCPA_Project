@@ -18,7 +18,7 @@ struct _CSR_LOADER_DATA {
     int *rowIdxs ;
     int *colIdxs ;
     double *nzs ;
-    int rows, cols ;
+    int rows, cols, nzNum ;
 } ;
 typedef struct _CSR_LOADER_DATA CSR_LOADER_DATA ;
 

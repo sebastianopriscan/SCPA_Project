@@ -83,6 +83,7 @@ int SCPA_CSR_DIRECT_LOADER_Init(FILE *file, SCPA_MMLOADER_CSR_LOADER_DATA *out) 
     data->nzs = (double *)((void *)data->colIdxs + sizeof(int)*iterator->nz) ;
     data->rows = iterator->rows ;
     data->cols = iterator->cols ;
+    data->nzNum = iterator->nz ;
 
     SCPA_MM_ENTRY *entry = iterator->next(iterator) ;
     while (entry->coordx != -1)
