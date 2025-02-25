@@ -9,4 +9,5 @@ include_directories(include)
 include_directories(${CMAKE_SOURCE_DIR}/lib/include)
 
 add_subdirectory(lib)
+add_subdirectory(src)
 add_subdirectory(tests)
