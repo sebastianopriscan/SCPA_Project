@@ -75,26 +75,61 @@ int main(void) {
     }
 
     if (SCPA_HLL_DIRECT_LOADER_Init(file, &loader, 1)) {
+        fclose(file) ;
         return -1 ;
     }
 
     HLL_LOADER_DATA *cast = loader.data ;
 
-    if (cast->rows != correct.rows) return -1 ;
-    if (cast->cols != correct.cols) return -1 ;
-    if (cast->nzs != correct.nzs) return -1 ;
-    if (cast->hack_size != correct.hack_size) return -1 ;
+    int retval = 0 ;
+
+    if (cast->rows != correct.rows) {
+        retval = -1 ;
+        goto terminate ;
+    }
+    if (cast->cols != correct.cols) {
+        retval = -1 ;
+        goto terminate ;
+    }
+    if (cast->nzs != correct.nzs) {
+        retval = -1 ;
+        goto terminate ;
+    }
+    if (cast->hack_size != correct.hack_size) {
+        retval = -1 ;
+        goto terminate ;
+    }
 
     for (int i = 0; i < 7 ; i++) {
-        if (cast->ellpacks[i].rows != correct.ellpacks[i].rows) return -1 ;
-        if (cast->ellpacks[i].cols != correct.ellpacks[i].cols) return -1 ;
-        if (cast->ellpacks[i].maxnz != correct.ellpacks[i].maxnz) return -1 ;
+        if (cast->ellpacks[i].rows != correct.ellpacks[i].rows) {
+            retval = -1 ;
+            goto terminate ;
+        }
+        if (cast->ellpacks[i].cols != correct.ellpacks[i].cols) {
+            retval = -1 ;
+            goto terminate ;
+        }
+        if (cast->ellpacks[i].maxnz != correct.ellpacks[i].maxnz) {
+            retval = -1 ;
+            goto terminate ;
+        }
 
         for (int j = 0; j < cast->ellpacks[i].maxnz * cast->ellpacks[i].rows ; j++) {
-            if (cast->ellpacks[i].columnMat[j] != correct.ellpacks[i].columnMat[j]) return -1 ;
-            if (fabs(cast->ellpacks[i].nzMat[j] - correct.ellpacks[i].nzMat[j]) > 0.01) return -1 ;
+            if (cast->ellpacks[i].columnMat[j] != correct.ellpacks[i].columnMat[j]) {
+                retval = -1 ;
+                goto terminate ;
+            }
+            if (fabs(cast->ellpacks[i].nzMat[j] - correct.ellpacks[i].nzMat[j]) > 0.01) {
+                retval = -1 ;
+                goto terminate ;
+            }
         }
     }
 
-    return 0 ;
+terminate :
+
+    fclose(file) ;
+    SCPA_HLL_DIRECT_LOADER_Destroy(&loader) ;
+
+    return retval ;
 }

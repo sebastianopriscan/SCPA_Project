@@ -35,6 +35,7 @@ static int getMaxNzs(IN SCPA_MM_ITERATOR *iterator, IN int hackSize, MALLOCD OUT
         free(entry) ;
         entry = iterator->next(iterator) ;
     }
+    free(entry) ;
 
     SCPA_MM_ITERATOR_Reset(iterator) ;
 
@@ -163,6 +164,7 @@ int SCPA_HLL_DIRECT_LOADER_Init(FILE *file, SCPA_MMLOADER_HLL_LOADER_DATA *out, 
     out->data = malloc(ell_size) ;
 
     if (out->data == NULL) {
+        free(maxima) ;
         return errno ;
     }
     HLL_LOADER_DATA *data = (HLL_LOADER_DATA *) out->data ;
@@ -205,6 +207,7 @@ int SCPA_HLL_DIRECT_LOADER_Init(FILE *file, SCPA_MMLOADER_HLL_LOADER_DATA *out, 
     }
     free(entry) ;
     free(iterator) ;
+    free(maxima) ;
 
     reindex_ell_columns(data) ;
 
@@ -214,5 +217,5 @@ int SCPA_HLL_DIRECT_LOADER_Init(FILE *file, SCPA_MMLOADER_HLL_LOADER_DATA *out, 
 }
 
 int SCPA_HLL_DIRECT_LOADER_Destroy(SCPA_MMLOADER_HLL_LOADER_DATA *loader) {
-
+    free(loader->data) ;
 }

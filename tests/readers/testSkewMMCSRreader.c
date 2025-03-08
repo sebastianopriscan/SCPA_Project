@@ -28,18 +28,37 @@ int main(void) {
     }
 
     if (SCPA_CSR_DIRECT_LOADER_Init(file, &loader)) {
+        fclose(file) ;
         return -1 ;
     }
 
     CSR_LOADER_DATA *cast = loader.data ;
 
+    int retval = 0 ;
+
     for (int i = 0 ; i < correct.rows ; i++)
-        if (cast->rowIdxs[i] != correct.rowIdxs[i]) return -1 ;
+        if (cast->rowIdxs[i] != correct.rowIdxs[i]) {
+            retval = -1 ;
+            goto terminate ;
+        }
+
 
     for (int i = 0; i < nzNum ; i++) {
-        if (cast->colIdxs[i] != correct.colIdxs[i]) return -1 ;
-        if (fabs(correct.nzs[i] - cast->nzs[i]) > 0.01) return -1 ;
+        if (cast->colIdxs[i] != correct.colIdxs[i]) {
+            retval = -1 ;
+            goto terminate ;
+        }
+        if (fabs(correct.nzs[i] - cast->nzs[i]) > 0.01) {
+            retval = -1 ;
+            goto terminate ;
+        }
+
     }
 
-    return 0 ;
+terminate:
+
+    fclose(file) ;
+    SCPA_CSR_DIRECT_LOADER_Destroy(&loader) ;
+
+    return retval ;
 }
