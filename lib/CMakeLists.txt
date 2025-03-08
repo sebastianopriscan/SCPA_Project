@@ -1,2 +1,3 @@
 add_subdirectory(matrix_market_io)
 add_subdirectory(matrix_market_loaders)
+add_subdirectory(sparse_matrix_cache)

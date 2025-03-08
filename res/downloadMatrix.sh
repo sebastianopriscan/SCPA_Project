@@ -1,0 +1,18 @@
+#! /bin/bash
+
+SCPA_TARGET=$1
+SCPA_REMOTE_URL=$2
+SCPA_FILE_NAME=$3
+
+cd ${SCPA_TARGET}
+
+wget ${SCPA_REMOTE_URL} -O ${SCPA_FILE_NAME}.tar.gz
+
+tar -xzf ${SCPA_FILE_NAME}.tar.gz
+
+mv ${SCPA_FILE_NAME}/${SCPA_FILE_NAME}.mtx ${SCPA_FILE_NAME}.mtx
+
+rm -rf ${SCPA_FILE_NAME}
+rm ${SCPA_FILE_NAME}.tar.gz
+
+mv ${SCPA_FILE_NAME}.mtx ${SCPA_FILE_NAME}
