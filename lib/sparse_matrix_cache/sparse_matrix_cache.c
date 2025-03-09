@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <errno.h>
 #include "sparse_matrix_cache/sparse_matrix_cache.h"
+#include "os_wrap/mkdir.h"
+#include "os_wrap/fork_exec.h"
 
 /**
  * This is the length of the common part of the URL to invoke in order to get the matrix plus \0
@@ -14,6 +16,7 @@
 const char *URL_ROOT = "https://suitesparse-collection-website.herokuapp.com/MM/" ;
 const char *URL_END = ".tar.gz" ;
 
+int wget_score(char *url, char *matrixName, char *workDir) ;
 
 static inline MALLOCD char *createURL(IN char *matrixName, IN char *matrixGroup) {
 
@@ -39,24 +42,13 @@ static inline MALLOCD char *cache_dir(IN char *matrixGroup, IN char *cache_root_
     }
     char *cursor ;
     cursor = stpcpy(allocd, cache_root_dir) ;
-    *cursor = '\0' ;
-
-    if(mkdir(allocd, 0771)) {
-        if (errno != EEXIST) {
-            free(allocd) ;
-            return NULL ;
-        }
-    }
-
     *cursor++ = '/' ;
     cursor = stpcpy(cursor, matrixGroup) ;
     *cursor = '\0' ;
 
-    if(mkdir(allocd, 0771)) {
-        if (errno != EEXIST) {
-            free(allocd) ;
-            return NULL ;
-        }
+    if (SCPA_mkdir_recurse(allocd)) {
+        free(allocd) ;
+        return NULL ;
     }
 
     return allocd ;
@@ -86,34 +78,14 @@ static inline int wget_cache(IN char *target, IN char *matrixGroup, IN char *mat
         char *cacheDir = cache_dir(matrixGroup, cache_root_dir) ;
         if (cacheDir == NULL) return 1 ;
 
-        int pid = fork() ;
-        if (pid == -1) {
-            free(cacheDir) ;
-            return 1 ;
-        }
+        char *url = createURL(matrixName, matrixGroup) ;
 
-        if (pid == 0) {
-            int status ;
-            do { wait(&status) ;} while(!WIFEXITED(status)) ;
-            if (WEXITSTATUS(status) == EXIT_FAILURE) {
-                free(cacheDir) ;
-                return 1 ;
-            }
-        } else {
+        int retval = wget_score(url, matrixName, cacheDir) ;
 
-            char *url = createURL(matrixName, matrixGroup) ;
-            if (url == NULL) exit(EXIT_FAILURE) ;
+        free(url) ;
+        free(cacheDir) ;
 
-            char *env[1] = {(char *)NULL} ;
-            char *arg[4] = {"./download.sh", cacheDir, url, matrixName} ;
-
-            execve("./download.sh", arg, env) ;
-
-            free(url) ;
-            exit(EXIT_FAILURE) ;
-        }
-
-        return stat(target, &ignored) ? 1 : 0 ;
+        return retval ;
 
     } else return 0 ;
 }
