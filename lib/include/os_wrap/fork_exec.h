@@ -3,6 +3,6 @@
 
 #include "common/definitions.h"
 
-int SCPA_fork_exec_wait(IN char **argv, IN char **envp) ;
+int SCPA_fork_exec_wait(IN char **argv, IN char *workDir) ;
 
 #endif
