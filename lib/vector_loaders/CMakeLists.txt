@@ -1,0 +1,1 @@
+add_library(SCPAVectorLoaders vector_loaders.c)
