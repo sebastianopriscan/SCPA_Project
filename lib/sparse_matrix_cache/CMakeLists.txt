@@ -1,2 +1,6 @@
 add_library(SparseMatrixCache sparse_matrix_cache.c wget_score.c)
 target_link_libraries(SparseMatrixCache SCPAOSWrap)
+
+add_library(SparseMatrixCacheTest sparse_matrix_cache.c wget_score.c)
+target_compile_definitions(SparseMatrixCacheTest PRIVATE -DTEST_BUILD)
+target_link_libraries(SparseMatrixCacheTest SCPAOSWrap)

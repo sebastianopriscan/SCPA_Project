@@ -13,7 +13,7 @@
  * 
  * @returns an integer different than zero in case of error, 0 otherwise
  */
-int SCPA_CSR_SERIAL_KERNEL(IN SCPA_MMLOADER_CSR_LOADER_DATA *matrix,
+void SCPA_CSR_SERIAL_KERNEL(IN SCPA_MMLOADER_CSR_LOADER_DATA *matrix,
     IN double* vector, OUT double *result) ;
 
 #endif

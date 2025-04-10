@@ -1,0 +1,1 @@
+add_library(SCPA_Serial_Kernel scpa_csr_serial_kernel.c)

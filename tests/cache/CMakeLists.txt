@@ -1,11 +1,11 @@
 add_executable(TestUrlBuilder testURLBuilder.c)
-target_link_libraries(TestUrlBuilder SparseMatrixCache)
+target_link_libraries(TestUrlBuilder SparseMatrixCacheTest)
 add_test(TestUrlBuilder TestUrlBuilder)
 
 add_executable(TestCacheDir testCacheDir.c)
-target_link_libraries(TestCacheDir SparseMatrixCache)
+target_link_libraries(TestCacheDir SparseMatrixCacheTest)
 add_test(TestCacheDir TestCacheDir)
 
 add_executable(TestSCPACache testCacheDownload.c)
-target_link_libraries(TestSCPACache SparseMatrixCache)
+target_link_libraries(TestSCPACache SparseMatrixCacheTest)
 add_test(TestSCPACache TestSCPACache)
