@@ -51,14 +51,14 @@ SCPA_ParsedArgs *SCPA_ParseArgs(int argc, char **argv) {
         if (args->loader == NULL) goto error_close_file ;
         if (SCPA_CSR_DIRECT_LOADER_Init(file, (args->loader))) goto error_free_and_close_file ;
         args->loaderClass = SCPA_DIRECT_CSR_CLASS ;
-        vectorSize = ((CSR_LOADER_DATA *)args->loader)->rows ;
+        vectorSize = ((CSR_LOADER_DATA *)((SCPA_MMLOADER_CSR_LOADER_DATA *)args->loader)->data)->rows ;
     }
     else if (strcmp(argv[3], "SCPA_DIRECT_HLL_CLASS") == 0) {
         args->loader = malloc(sizeof(SCPA_MMLOADER_HLL_LOADER_DATA)) ;
         if (args->loader == NULL) goto error_close_file ;
         if (SCPA_HLL_DIRECT_LOADER_Init(file, (args->loader), hackSize)) goto error_free_and_close_file ;
         args->loaderClass = SCPA_DIRECT_HLL_CLASS ;
-        vectorSize = ((HLL_LOADER_DATA *)args->loader)->rows ;
+        vectorSize = ((HLL_LOADER_DATA *)((SCPA_MMLOADER_HLL_LOADER_DATA *)args->loader)->data)->rows ;
     } else goto error_close_file ;
 
     if (strcmp(argv[4], "VECTOR_FILE") == 0 && argc >= 5) {

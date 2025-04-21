@@ -16,7 +16,7 @@ void SCPA_CSR_SERIAL_KERNEL(IN SCPA_MMLOADER_CSR_LOADER_DATA *matrix, IN double*
 
     for (int j = cumulated ; j < data->nzNum ; j++) {
         int colIdx = data->colIdxs[j] ;
-        y[data->rowIdxs[data->rows -1]] += data->nzs[j] * x[colIdx] ;
+        y[data->rows -1] += data->nzs[j] * x[colIdx] ;
     }
 
     return ;

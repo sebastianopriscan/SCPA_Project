@@ -20,6 +20,14 @@ int main(int argc, char **argv) {
     }
 
     double *result = malloc(sizeof(double) * ((SCPA_MMLOADER_CSR_LOADER_DATA *)args->loader)->data->cols) ;
+    if (result == NULL) {
+        fprintf(stderr, "Serial kernel supports only simple CSR\n") ;
+        SCPA_HLL_DIRECT_LOADER_Destroy(args->loader) ;
+        free(args->loader) ;
+        free(args->output) ;
+        free(args) ;
+        return 1;
+    }
 
     struct timespec start,end ;
 
@@ -34,6 +42,7 @@ int main(int argc, char **argv) {
 
     free(result) ;
     SCPA_CSR_DIRECT_LOADER_Destroy(args->loader) ;
+    free(args->loader) ;
     free(args->output) ;
     free(args) ;
     printf("%ld\n", (end.tv_sec - start.tv_sec)*NANOSEC_PER_SEC + end.tv_nsec - start.tv_nsec) ;

@@ -3,7 +3,7 @@ project(SCPA_Project)
 
 include(CTest)
 
-add_compile_definitions(Wall Wextra)
+add_compile_definitions(Wall Wextra _POSIX_C_SOURCE=200809L)
 
 include_directories(include)
 include_directories(${CMAKE_SOURCE_DIR}/lib/include)
