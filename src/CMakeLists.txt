@@ -1,4 +1,5 @@
 add_subdirectory(serial/csr)
+add_subdirectory(parallel/omp/csr)
 
 add_executable(SCPA_Serial_Multiplier serialMultiply.c)
 target_link_libraries(SCPA_Serial_Multiplier SCPA_Serial_Kernel SCPA_Args_Parser)

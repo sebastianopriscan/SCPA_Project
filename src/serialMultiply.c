@@ -4,7 +4,6 @@
 #include "args/parse_args.h"
 #include "serial/csr/scpa_csr_serial_kernel.h"
 
-
 int main(int argc, char **argv) {
     SCPA_ParsedArgs *args = SCPA_ParseArgs(argc, argv) ;
 
@@ -31,19 +30,26 @@ int main(int argc, char **argv) {
 
     struct timespec start,end ;
 
-    clock_gettime(CLOCK_BOOTTIME, &start) ;
-    SCPA_CSR_SERIAL_KERNEL(
-        (SCPA_MMLOADER_CSR_LOADER_DATA *)args->loader,
-        args->output,
-        result
-    ) ;
-    clock_gettime(CLOCK_BOOTTIME, &end) ;
-
+    for (int i = 0; i < args->times; i++) {
+        clock_gettime(CLOCK_BOOTTIME, &start) ;
+        SCPA_CSR_SERIAL_KERNEL(
+            (SCPA_MMLOADER_CSR_LOADER_DATA *)args->loader,
+            args->output,
+            result
+        ) ;
+        clock_gettime(CLOCK_BOOTTIME, &end) ;
+        printf("%s %s %s SERIAL %d %ld\n",
+            argv[1],
+            argv[2],
+            SCPA_LoaderClassToString(args->loaderClass),
+            0,
+            (end.tv_sec - start.tv_sec)*NANOSEC_PER_SEC + end.tv_nsec - start.tv_nsec
+        ) ;
+    }
 
     free(result) ;
     SCPA_CSR_DIRECT_LOADER_Destroy(args->loader) ;
     free(args->loader) ;
     free(args->output) ;
     free(args) ;
-    printf("%ld\n", (end.tv_sec - start.tv_sec)*NANOSEC_PER_SEC + end.tv_nsec - start.tv_nsec) ;
 }

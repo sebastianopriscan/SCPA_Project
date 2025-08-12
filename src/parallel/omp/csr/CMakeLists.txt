@@ -1,0 +1,1 @@
+add_library(SCPA_Omp_Kernel_v0 scpa_csr_omp_kernel_v0.c)

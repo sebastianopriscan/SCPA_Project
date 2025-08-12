@@ -10,46 +10,37 @@
 
 //TODO : CHECK
 static inline void reshape_array(CSR_LOADER_DATA *data, int row, int col, double nz) {
-    int countAll = 0 ;
-    int count = 0 ;
-    int countMinus = 0 ;
-    for (int i = 0; i < data->rows; i++) {
-        countAll += data->rowIdxs[i] ;
-        if (i < row)
-            countMinus += data->rowIdxs[i] ;
-        if (i <= row)
-            count += data->rowIdxs[i] ;
+
+    int baseIdx = data->rowIdxs[row] ;
+    int size = (row == data->rows -1 ? data->nzNum : data->rowIdxs[row+1]) ;
+    int temp[2], mod = 0;
+    double nzArr[2] ;
+    int insertPoint = baseIdx -1 ;
+
+    for (int i = baseIdx; i < size; i++) {
+        if (data->colIdxs[i] < col) {
+            insertPoint++;
+        }
+        if (data->colIdxs[i] == -1) {
+            size = i ;
+            break;
+        }
     }
 
-    int temp1, temp2 = data->colIdxs[countMinus], mod = 1;
-    double nz1, nz2 = data->nzs[countMinus] ;
-    int insertPoint = countMinus ;
-    for (int i = countMinus ; i < countAll ; i++) {
-        if (data->colIdxs[i] > col || i >= count) {
-            if (mod) {
-                temp1 = data->colIdxs[i+1] ;
-                data->colIdxs[i+1] = temp2 ;
-                nz1 = data->nzs[i+1] ;
-                data->nzs[i+1] = nz2 ;
-            } else {
-                temp2 = data->colIdxs[i+1] ;
-                data->colIdxs[i+1] = temp1 ;
-                nz2 = data->nzs[i+1] ;
-                data->nzs[i+1] = nz1 ;
-            }
+    temp[1] = data->colIdxs[insertPoint] ;
+    nzArr[1] = data->nzs[insertPoint] ;
 
-            mod = (mod +1) %2 ;
-        } else {
-            insertPoint++ ;
-            temp2 = data->colIdxs[i+1] ;
-            nz2 = data->nzs[i+1] ;
-        }
+    for (int i = insertPoint ; i < size ; i++) {
+        temp[mod] = data->colIdxs[i+1] ;
+        data->colIdxs[i+1] = temp[1- mod] ;
+        nzArr[mod] = data->nzs[i+1] ;
+        data->nzs[i+1] = nzArr[1-mod] ;
+
+        mod = (mod +1) %2 ;
     }
 
     data->colIdxs[insertPoint] = col ;
     data->nzs[insertPoint] = nz ;
-    data->rowIdxs[row]++ ;
-
 }
 
 static double SCPA_MMLOADER_ReadAt(SCPA_MMLOADER_CSR_LOADER_DATA *loader, int row, int col) {
@@ -75,8 +66,9 @@ int SCPA_CSR_DIRECT_LOADER_Init(FILE *file, SCPA_MMLOADER_CSR_LOADER_DATA *out) 
         return errno ;
     }
     CSR_LOADER_DATA *data = out->data ;
-    memset(data, 0, sizeof(CSR_LOADER_DATA) + sizeof(int)*(iterator->rows + iterator->nz) 
-        + sizeof(double)*(iterator->nz)) ;
+    memset(data, 0, sizeof(CSR_LOADER_DATA) + sizeof(int)*(iterator->rows)) ;
+    memset((void*)data + sizeof(CSR_LOADER_DATA) + sizeof(int)*iterator->rows, -1, sizeof(int)*(iterator->nz)) ;
+    memset((void*)data + sizeof(CSR_LOADER_DATA) + sizeof(int)*(iterator->rows + iterator->nz), 0, sizeof(double)*(iterator->nz)) ;
     //memset(data + sizeof(CSR_LOADER_DATA), -1, sizeof(double)*(iterator->rows)) ;
     data->rowIdxs = (int *)((void *)data + sizeof(CSR_LOADER_DATA)) ;
     data->colIdxs = (int *)((void *)data->rowIdxs + sizeof(int)*iterator->rows) ;
@@ -86,6 +78,27 @@ int SCPA_CSR_DIRECT_LOADER_Init(FILE *file, SCPA_MMLOADER_CSR_LOADER_DATA *out) 
     data->nzNum = iterator->nz ;
 
     SCPA_MM_ENTRY *entry = iterator->next(iterator) ;
+    while (entry->coordx != -1)
+    {
+        int x = entry->coordx -1 ;
+
+        data->rowIdxs[x]++ ;
+
+        free(entry) ;
+        entry = iterator->next(iterator) ;
+    }
+    free(entry) ;
+
+    int cumulated = 0;
+    int value = 0;
+    for (int i = 0; i < data->rows; i++) {
+        cumulated += value ;
+        value = data->rowIdxs[i] ;
+        data->rowIdxs[i] = cumulated ;
+    }
+
+    SCPA_MM_ITERATOR_Reset(iterator) ;
+    entry = iterator->next(iterator) ;
     while (entry->coordx != -1)
     {
         int x = entry->coordx -1 ;
@@ -99,15 +112,6 @@ int SCPA_CSR_DIRECT_LOADER_Init(FILE *file, SCPA_MMLOADER_CSR_LOADER_DATA *out) 
     free(entry) ;
     free(iterator) ;
 
-    int cumulated = data->rowIdxs[0] ;
-    data->rowIdxs[0] = 0 ;
-
-    for (int i = 1 ; i < data->rows ; i++) {
-        int temp = data->rowIdxs[i] ;
-        data->rowIdxs[i] = cumulated ;
-        cumulated += temp ;
-    }
-    
     out->SCPA_MMLOADER_ReadAt = SCPA_MMLOADER_ReadAt ;
     
     return 0 ;

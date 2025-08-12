@@ -13,6 +13,20 @@ typedef enum _SCPA_VectorType {
     VECTOR_RANDOM_PATTERN
 } SCPA_VectorType ;
 
+const char *SCPA_DIRECT_HLL_CLASS_STR = "SCPA_DIRECT_HLL_CLASS";
+const char *SCPA_DIRECT_CSR_CLASS_STR = "SCPA_DIRECT_CSR_CLASS";
+
+const char *SCPA_LoaderClassToString(SCPA_LoaderClass class) {
+    switch(class) {
+        case (SCPA_DIRECT_CSR_CLASS) :
+            return SCPA_DIRECT_CSR_CLASS_STR ;
+        case (SCPA_DIRECT_HLL_CLASS) :
+            return SCPA_DIRECT_HLL_CLASS_STR ;
+        default :
+            return NULL ;
+    }
+}
+
 SCPA_ParsedArgs *SCPA_ParseArgs(int argc, char **argv) {
 
     if (argc < 5) goto error_return ;
@@ -21,6 +35,7 @@ SCPA_ParsedArgs *SCPA_ParseArgs(int argc, char **argv) {
     int hackSize = 32 ;
     int seed = 42 ;
     int vectorSize = 0 ;
+    int times = 1;
     for (int i = 5 ; i < argc ; i++) {
         if (strcmp("--cache-dir", argv[i]) == 0 && i+1 < argc) {
             cacheDir = argv[i+1] ;
@@ -37,11 +52,18 @@ SCPA_ParsedArgs *SCPA_ParseArgs(int argc, char **argv) {
             if (*endptr != '\0' || *argv[i+1] == '\0' || errno == ERANGE || errno == EINVAL) 
                 goto error_return ;
         }
+        else if (strcmp("--times", argv[i]) == 0 && i+1 < argc) {
+            char *endptr ;
+            times = strtol(argv[i+1], &endptr, 0) ;
+            if (*endptr != '\0' || *argv[i+1] == '\0' || errno == ERANGE || errno == EINVAL) 
+                goto error_return ;
+        }
     }
 
     SCPA_ParsedArgs *args = malloc(sizeof(SCPA_ParsedArgs)) ;
 
     if (args == NULL) goto error_return ;
+    args->times = times ;
 
     FILE *file ;
     if (SCPA_SPCACHE_OpenMatrix(argv[2], argv[1], cacheDir, &file)) goto error_free_args ;
@@ -100,6 +122,6 @@ error_return :
 
     fprintf(stderr, "Usage: ./progname matrixGroup matrixName format{SCPA_DIRECT_(CSR|HLL)_CLASS} "
         "vectorRetrieval{VECTOR_(FILE|RANDOM(?:_PATTERN))} [vectorFile --cache-dir cacheDir --hll-hacksize hacksize "
-        "--rand-seed seed]\n") ;
+        "--rand-seed seed --times times]\n") ;
     return NULL ;
 }

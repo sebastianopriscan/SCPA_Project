@@ -154,13 +154,17 @@ static SCPA_MM_ENTRY *skew_next_pattern(SCPA_MM_ITERATOR *this) {
     return entry ;
 }
 
-static int readNzs(FILE *file) {
+static int readNzs(FILE *file, int isPattern) {
     int nzs = 0 ;
     int row, col ;
     double dummy ;
     MM_typecode matcode ;
 
-    while(fscanf(file, "%d %d %lg", &row, &col, &dummy) == 3)
+    while(
+        !isPattern ?
+            fscanf(file, "%d %d %lg", &row, &col, &dummy) == 3 :
+            fscanf(file, "%d %d", &row, &col) == 2
+    )
         nzs += row != col ? 2 : 1 ;
     
     fseek(file, 0, SEEK_SET) ;
@@ -208,11 +212,11 @@ SCPA_MM_ITERATOR *SCPA_MM_ITERATOR_Create(IN FILE *file) {
 
     switch(matcode[3]) {
         case 'K' :
-            iterator->nz = readNzs(file) ;
+            iterator->nz = readNzs(file, mm_is_pattern(matcode)) ;
             iterator->next = mm_is_pattern(matcode) ? skew_next_pattern : skew_next ;
             break ;
         case 'S' :
-            iterator->nz = readNzs(file) ;
+            iterator->nz = readNzs(file, mm_is_pattern(matcode)) ;
             iterator->next = mm_is_pattern(matcode) ? symmetric_next_pattern : symmetric_next ;
             break ;
         case 'G' :
