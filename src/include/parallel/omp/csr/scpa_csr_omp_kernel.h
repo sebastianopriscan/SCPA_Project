@@ -10,8 +10,6 @@
  *                 field, the matrix in CSR format with info on its size, too
  * @param vector : Pointer to a dense vector to be multiplied with matrix, the user MUST ensure the dimensions match
  * @param result : Pointer to a memory area on which the result shall be dumped, the user MUST ensure the dimensions match
- * 
- * @returns an integer different than zero in case of error, 0 otherwise
  */
 void SCPA_CSR_OMP_KERNEL(IN SCPA_MMLOADER_CSR_LOADER_DATA *matrix,
     IN double* vector, OUT double *result) ;

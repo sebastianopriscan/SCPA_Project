@@ -76,6 +76,7 @@ int main(int argc, char **argv) {
             for (int i = 0; i < out.data->rows; i++) {
                 vector[i] = (double) i ;
             }
+            memset(vector + out.data->rows, 0, sizeof(double) * out.data->rows) ;
 
 
             FILE *output = fopen(outfilename, "w+") ;
@@ -89,7 +90,7 @@ int main(int argc, char **argv) {
             log_for_matrix("Multiplied matrix %s %s") ;
 
             for (int i = 0; i < out.data->rows; i++) {
-                if(fprintf(output, "%lg\n", (vector+out.data->rows)[i]) < 0) {
+                if(fprintf(output, "%.17g\n", (vector+out.data->rows)[i]) < 0) {
                     error_for_matrix("Error writing result entry for matrix %s %s. Skipping...") ;
                     break;
                 }

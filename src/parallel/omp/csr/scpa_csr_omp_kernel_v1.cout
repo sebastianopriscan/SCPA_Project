@@ -1,0 +1,33 @@
+#include "parallel/omp/csr/scpa_csr_omp_kernel.h"
+#include <omp.h>
+
+
+/**
+ * Considerations on the kernel:
+ * With respect to v0, this kernel tries shifting the parallelization to the inner loop
+ * Too much trashing
+ */
+
+void SCPA_CSR_OMP_KERNEL(IN SCPA_MMLOADER_CSR_LOADER_DATA *matrix, IN double* x, OUT double *y) {
+
+    CSR_LOADER_DATA *data = matrix->data ;
+
+    for (int i = 0 ; i < data->rows -1 ; i++) {
+        int start = data->rowIdxs[i] ;
+        int end = data->rowIdxs[i+1] ;
+        #pragma omp parallel for
+        for (int j = start ; j < end ; j++) {
+            int colIdx = data->colIdxs[j] ;
+            #pragma omp atomic update
+            y[i] += data->nzs[j] * x[colIdx] ;
+        }
+    }
+    #pragma omp parallel for
+    for (int j = data->rowIdxs[data->rows-1] ; j < data->nzNum ; j++) {
+        int colIdx = data->colIdxs[j] ;
+        #pragma omp atomic update
+        y[data->rows -1] += data->nzs[j] * x[colIdx] ;
+    }
+
+    return ;
+}

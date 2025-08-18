@@ -1,1 +1,11 @@
-add_library(SCPA_Omp_Kernel_v0 scpa_csr_omp_kernel_v0.c)
+find_package(OpenMP REQUIRED)
+
+foreach(SCPA_CSR_OMP_KERNEL_VERSION ${SCPA_CSR_OMP_KERNEL_VERSIONS})
+
+    set(SCPA_CSR_OMP_LIB "SCPA_CSR_Omp_Kernel_v${SCPA_CSR_OMP_KERNEL_VERSION}")
+    set(SCPA_CSR_OMP_SRC "scpa_csr_omp_kernel_v${SCPA_CSR_OMP_KERNEL_VERSION}.c")
+
+    add_library(${SCPA_CSR_OMP_LIB} ${SCPA_CSR_OMP_SRC})
+    target_link_libraries(${SCPA_CSR_OMP_LIB} OpenMP::OpenMP_C)
+
+endforeach(SCPA_CSR_OMP_KERNEL_VERSION ${SCPA_CSR_OMP_KERNEL_VERSIONS})
