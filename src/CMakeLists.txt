@@ -8,10 +8,15 @@ foreach(SCPA_CSR_OMP_KERNEL_VERSION ${SCPA_CSR_OMP_KERNEL_VERSIONS})
 
     set(SCPA_CSR_OMP_LIB "SCPA_CSR_Omp_Kernel_v${SCPA_CSR_OMP_KERNEL_VERSION}")
     set(SCPA_CSR_OMP_MULTIPLIER "SCPA_CSR_OMP_Multiplier_v${SCPA_CSR_OMP_KERNEL_VERSION}")
+    set(SCPA_KERNEL_SIGNATURE "OMP_v${SCPA_CSR_OMP_KERNEL_VERSION}")
 
     add_executable(${SCPA_CSR_OMP_MULTIPLIER} ompMultiply.c)
+    target_compile_definitions(${SCPA_CSR_OMP_MULTIPLIER} PRIVATE "SCPA_KERNEL_SIGNATURE=\"${SCPA_KERNEL_SIGNATURE}\"")
     target_link_libraries(${SCPA_CSR_OMP_MULTIPLIER} ${SCPA_CSR_OMP_LIB} SCPA_Args_Parser)
 
 endforeach(SCPA_CSR_OMP_KERNEL_VERSION ${SCPA_CSR_OMP_KERNEL_VERSIONS})
+
+add_executable(SCPA_Prepare_Plot_Data prepare_plot_data.c)
+target_link_libraries(SCPA_Prepare_Plot_Data SCPAPSQL)
 
 configure_file(results_to_query.awk results_to_query.awk FILE_PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE)

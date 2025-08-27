@@ -67,16 +67,16 @@ int main(int argc, char **argv) {
             }
             log_for_matrix("Loaded matrix %s %s in CSR format") ;
 
-            double *vector = malloc(2* sizeof(double) * out.data->rows) ;
+            double *vector = malloc(sizeof(double) * (out.data->rows + out.data->cols)) ;
             if (vector == NULL) {
                 error_for_matrix("Error allocating vector to multiply matrix %s %s with. Skipping...") ;
                 goto loop_destroy_loader ;
             }
 
-            for (int i = 0; i < out.data->rows; i++) {
-                vector[i] = (double) i ;
+            for (int i = 0; i < out.data->cols; i++) {
+                vector[i] = (double) (i % 100) ;
             }
-            memset(vector + out.data->rows, 0, sizeof(double) * out.data->rows) ;
+            memset(vector + out.data->cols, 0, sizeof(double) * out.data->rows) ;
 
 
             FILE *output = fopen(outfilename, "w+") ;
@@ -86,11 +86,11 @@ int main(int argc, char **argv) {
             }
 
             log_for_matrix("Multiplying matrix %s %s") ;
-            SCPA_CSR_SERIAL_KERNEL(&out, vector, vector + out.data->rows) ;
+            SCPA_CSR_SERIAL_KERNEL(&out, vector, vector + out.data->cols) ;
             log_for_matrix("Multiplied matrix %s %s") ;
 
             for (int i = 0; i < out.data->rows; i++) {
-                if(fprintf(output, "%.17g\n", (vector+out.data->rows)[i]) < 0) {
+                if(fprintf(output, "%.17g\n", (vector+out.data->cols)[i]) < 0) {
                     error_for_matrix("Error writing result entry for matrix %s %s. Skipping...") ;
                     break;
                 }

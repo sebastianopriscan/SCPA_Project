@@ -4,6 +4,10 @@
 #include "args/parse_args.h"
 #include "parallel/omp/csr/scpa_csr_omp_kernel.h"
 
+#ifndef SCPA_KERNEL_SIGNATURE
+#error "A kernel version must be declared"
+#endif
+
 int main(int argc, char **argv) {
     SCPA_ParsedArgs *args = SCPA_ParseArgs(argc, argv) ;
 
@@ -38,10 +42,11 @@ int main(int argc, char **argv) {
             result
         ) ;
         clock_gettime(CLOCK_BOOTTIME, &end) ;
-        printf("%s %s %s OMP_V2 %d %ld\n",
+        printf("%s %s %s %s %d %ld\n",
             argv[1],
             argv[2],
             SCPA_LoaderClassToString(args->loaderClass),
+            SCPA_KERNEL_SIGNATURE,
             0,
             (end.tv_sec - start.tv_sec)*NANOSEC_PER_SEC + end.tv_nsec - start.tv_nsec
         ) ;

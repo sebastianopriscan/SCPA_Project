@@ -63,17 +63,17 @@ int main(void) {
             }
             log_for_matrix("Loaded matrix %s %s in CSR format") ;
 
-            double *vector = malloc(2* sizeof(double) * out.data->rows) ;
+            double *vector = malloc(sizeof(double) * (out.data->rows+ out.data->cols)) ;
             if (vector == NULL) {
                 error_for_matrix("Error allocating vector to multiply matrix %s %s with. Exiting...") ;
                 errors = 1 ;
                 goto loop_destroy_loader ;
             }
 
-            for (int i = 0; i < out.data->rows; i++) {
-                vector[i] = (double) i ;
+            for (int i = 0; i < out.data->cols; i++) {
+                vector[i] = (double) (i % 100) ;
             }
-            memset(vector + out.data->rows, 0, sizeof(double) * out.data->rows) ;
+            memset(vector + out.data->cols, 0, sizeof(double) * out.data->rows) ;
 
             FILE *output = fopen(outfilename, "r") ;
             if (output == NULL) {
@@ -83,7 +83,7 @@ int main(void) {
             }
 
             log_for_matrix("Multiplying matrix %s %s") ;
-            SCPA_CSR_OMP_KERNEL(&out, vector, vector + out.data->rows) ;
+            SCPA_CSR_OMP_KERNEL(&out, vector, vector + out.data->cols) ;
             log_for_matrix("Multiplied matrix %s %s") ;
 
             double num = 0 ;
@@ -93,10 +93,15 @@ int main(void) {
                     errors = 1;
                     break;
                 }
-                if (fabs(1.0 - ((vector + out.data->rows)[i] / num)) > 0.001) {
-                    error_for_matrix("Error comparating entries for matrix %s %s, relative error for entry %d is %lg. Exiting...", i, fabs(1.0 - ((vector + out.data->rows)[i] / num))) ;
+                if (num == 0.) {
+                    if (fabs((vector + out.data->cols)[i] - num) > 0.00001) {
+                        error_for_matrix("Error comparating entries for matrix %s %s, absolute error for entry %d is %lg. Exiting...", i, fabs((vector + out.data->cols)[i] - num)) ;
+                        errors = 1;
+                    }
+                }
+                else if (fabs(1.0 - ((vector + out.data->cols)[i] / num)) > 0.001) {
+                    error_for_matrix("Error comparating entries for matrix %s %s, relative error for entry %d is %lg. Exiting...", i, fabs(1.0 - ((vector + out.data->cols)[i] / num))) ;
                     errors = 1;
-                    break;
                 }
 
             }
@@ -111,8 +116,6 @@ loop_free_matrix:
             fclose(matrix) ;
 loop_free_pathname:
             free(outfilename) ;
-
-            if (errors) break;
         }
         else {
             fprintf(stderr, "Error retrieving matrix data. Exiting...\n") ;
