@@ -14,7 +14,7 @@ char name_buffer[BUFFERSIZE] ;
 int main(int argc, char **argv) {
 
     if (argc != 2) {
-        fprintf(stderr, "Usage: ./progName result_store_path") ;
+        fprintf(stderr, "Usage: ./progName result_store_path\n") ;
         return -1 ;
     }
 

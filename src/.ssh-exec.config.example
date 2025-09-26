@@ -1,0 +1,2 @@
+SSH_EXEC_USER='user@ip-address'
+SSH_EXEC_TARGET_DIR='/path/where/program/and/data/are/copied/and/executed'

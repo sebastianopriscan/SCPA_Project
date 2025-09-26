@@ -54,7 +54,6 @@ void SCPA_CSR_OMP_KERNEL(IN SCPA_MMLOADER_CSR_LOADER_DATA *matrix, IN double* x,
 
         int tid = omp_get_thread_num() ;
         int threads = omp_get_num_threads() ;
-        printf("HI! I'm thread %d of %d\n", tid, threads) ;
 
         int nzLoad = data->nzNum / threads ;
         int modulus = tid < data->nzNum % threads ? tid : data->nzNum % threads ;

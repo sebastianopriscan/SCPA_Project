@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 
@@ -10,6 +11,14 @@ int SCPA_fork_exec_wait(char **argv, char *workDir) {
     if (pid == -1) return 1 ;
 
     if (pid == 0) {
+
+        FILE *null_out = freopen("/dev/null", "w", stdout) ;
+        FILE *null_err = freopen("/dev/null", "w", stderr) ;
+
+        if (null_out == NULL || null_err == NULL) {
+            exit(EXIT_FAILURE) ;
+        }
+
         if (chdir(workDir)) {
             exit(EXIT_FAILURE) ;
         }

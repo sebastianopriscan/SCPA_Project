@@ -38,12 +38,13 @@ int main(int argc, char **argv) {
             result
         ) ;
         clock_gettime(CLOCK_BOOTTIME, &end) ;
-        printf("%s %s %s SERIAL %d %ld\n",
+        printf("%s %s %s SERIAL %d %ld %d\n",
             argv[1],
             argv[2],
             SCPA_LoaderClassToString(args->loaderClass),
             0,
-            (end.tv_sec - start.tv_sec)*NANOSEC_PER_SEC + end.tv_nsec - start.tv_nsec
+            (end.tv_sec - start.tv_sec)*NANOSEC_PER_SEC + end.tv_nsec - start.tv_nsec,
+            ((SCPA_MMLOADER_CSR_LOADER_DATA *)args->loader)->data->nzNum
         ) ;
     }
 
