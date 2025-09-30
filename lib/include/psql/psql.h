@@ -41,7 +41,7 @@ void SCPA_PSQL_Clear() ;
  * @returns a number greater than 0 representing the time in nanoseconds the kernel spent multiplying,
  *          -1 in case there are errors or no more times to return.
  */
-int SCPA_PSQL_NextTime(SCPA_PSQL_TIMES_ITERATOR *iterator) ;
+long SCPA_PSQL_NextTime(SCPA_PSQL_TIMES_ITERATOR *iterator) ;
 
 /**
  * Get the next matrix stored in the schema.

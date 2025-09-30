@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
         password
     ) ;
 
-    SCPA_PSQL_TIMES_ITERATOR *matrices_iterator = SCPA_PSQL_Matrices(), *times_iterator ;
+    SCPA_PSQL_TIMES_ITERATOR *matrices_iterator = SCPA_PSQL_Matrices(), *times_iterator, *serial_iterator ;
     if (matrices_iterator == NULL) {
         fprintf(stderr, "Error getting matrices names. Exiting...\n") ;
         SCPA_PSQL_Clear() ;
@@ -49,16 +49,19 @@ int main(int argc, char **argv) {
 
         while(!SCPA_PSQL_NextMatrix(matrices_iterator, &name)) {
             times_iterator = SCPA_PSQL_TimesForConfigCSR(name.groupName, name.matName, kernel_name, "SCPA_DIRECT_CSR_CLASS") ;
-            if (times_iterator == NULL) {
+            serial_iterator = SCPA_PSQL_TimesForConfigCSR(name.groupName, name.matName, "SERIAL", "SCPA_DIRECT_CSR_CLASS") ;
+            if (times_iterator == NULL || serial_iterator == NULL) {
                 fprintf(stderr, "Error getting times for kernel and matrix. Exiting...\n") ;
                 SCPA_PSQL_DestroyIterator(matrices_iterator) ;
                 SCPA_PSQL_Clear() ;
                 return 1 ;
             }
+            double serial_mean = 0. ;
             double mean = 0. ;
             double stddev = 0. ;
             double idx = 1. ;
-            int time = SCPA_PSQL_NextTime(times_iterator) ;
+            long time = SCPA_PSQL_NextTime(times_iterator) ;
+            long serial_time = SCPA_PSQL_NextTime(serial_iterator) ;
             while(time >= 0) {
                 stddev += (time-mean)*(time-mean)*(idx-1)/idx ;
                 mean += (time-mean)/idx ;
@@ -66,7 +69,14 @@ int main(int argc, char **argv) {
                 idx += 1. ;
                 time = SCPA_PSQL_NextTime(times_iterator) ;
             }
-            fprintf(out, "%d %.17g %.17g %s_%s\n", name.nzs, 2. * ((double) name.nzs) / mean, stddev, name.groupName, name.matName) ;
+            idx = 1. ;
+            while(serial_time >= 0) {
+                serial_mean += (serial_time-serial_mean)/idx ;
+
+                idx += 1. ;
+                serial_time = SCPA_PSQL_NextTime(serial_iterator) ;
+            }
+            fprintf(out, "%d %.17g %.17g %.17g %s_%s\n", name.nzs, 2. * ((double) name.nzs) / mean, stddev, serial_mean / mean, name.groupName, name.matName) ;
         }
         fclose(out) ;
         kernel_name = strtok(NULL, ",") ;

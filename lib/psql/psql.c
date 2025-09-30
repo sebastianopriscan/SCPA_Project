@@ -7,7 +7,7 @@
 #define SELECT_TIMES_QUERY "SELECT time FROM results WHERE matrix_name=$1 AND group_name=$2 AND kernel_id=$3 AND loader=$4 ;"
 #define SELECT_TIMES_PARAMS 4
 
-#define MATRICES_NAMES_QUERY "SELECT DISTINCT group_name, matrix_name, nzs FROM results ;"
+#define MATRICES_NAMES_QUERY "SELECT DISTINCT group_name, matrix_name, nzs FROM results ORDER BY nzs ;"
 
 const Oid selectOids[4] = {
     1043,
@@ -24,7 +24,7 @@ typedef struct _SCPA_PSQL_TIMES_ITERATOR {
     int limit ;
 } SCPA_PSQL_TIMES_ITERATOR ;
 
-int SCPA_PSQL_NextTime(SCPA_PSQL_TIMES_ITERATOR *iterator) {
+long SCPA_PSQL_NextTime(SCPA_PSQL_TIMES_ITERATOR *iterator) {
     if (iterator->index == iterator->limit) {
         return -1 ;
     }
@@ -33,7 +33,7 @@ int SCPA_PSQL_NextTime(SCPA_PSQL_TIMES_ITERATOR *iterator) {
     iterator->index++ ;
 
     char *endptr ;
-    int retVal = strtol(retStr, &endptr, 10) ;
+    long retVal = strtol(retStr, &endptr, 10) ;
     if (*endptr != '\0' || *retStr == '\0' || errno == ERANGE || errno == EINVAL) {
         PQclear(iterator->result) ;
         free(iterator) ;

@@ -4,6 +4,11 @@ add_executable(TestNormalMMCSRReader testNormalMMCSRreader.c)
 target_link_libraries(TestNormalMMCSRReader CSRDirectLoader)
 add_test(TestNormalMMCSRReader TestNormalMMCSRReader)
 
+add_executable(TestNormalMMCSRTransposedReader testNormalMMCSRTransposedreader.c)
+
+target_link_libraries(TestNormalMMCSRTransposedReader CSRTransposedLoader)
+add_test(TestNormalMMCSRTransposedReader TestNormalMMCSRTransposedReader)
+
 add_executable(TestNormalMMHLLReader testNormalMMHLLreader.c)
 
 target_link_libraries(TestNormalMMHLLReader HLLDirectLoader)
@@ -15,6 +20,11 @@ add_executable(TestSymmetricMMCSRReader testSymmetricMMCSRreader.c)
 
 target_link_libraries(TestSymmetricMMCSRReader CSRDirectLoader)
 add_test(TestSymmetricMMCSRReader TestSymmetricMMCSRReader)
+
+add_executable(TestSymmetricMMCSRTransposedReader testSymmetricMMCSRTransposedreader.c)
+
+target_link_libraries(TestSymmetricMMCSRTransposedReader CSRTransposedLoader)
+add_test(TestSymmetricMMCSRTransposedReader TestSymmetricMMCSRTransposedReader)
 
 add_executable(TestSymmetricMMHLLReader testSymmetricMMHLLreader.c)
 
@@ -28,6 +38,11 @@ add_executable(TestSkewMMCSRReader testSkewMMCSRreader.c)
 target_link_libraries(TestSkewMMCSRReader CSRDirectLoader)
 add_test(TestSkewMMCSRReader TestSkewMMCSRReader)
 
+add_executable(TestSkewMMCSRTransposedReader testSkewMMCSRTransposedreader.c)
+
+target_link_libraries(TestSkewMMCSRTransposedReader CSRTransposedLoader)
+add_test(TestSkewMMCSRTransposedReader TestSkewMMCSRTransposedReader)
+
 add_executable(TestSkewMMHLLReader testSkewMMHLLreader.c)
 
 target_link_libraries(TestSkewMMHLLReader HLLDirectLoader)
@@ -40,6 +55,10 @@ add_executable(TestPatternMMCSRReader testPatternMMCSRreader.c)
 target_link_libraries(TestPatternMMCSRReader CSRDirectLoader)
 add_test(TestPatternMMCSRReader TestPatternMMCSRReader)
 
+add_executable(TestPatternMMCSRTransposedReader testPatternMMCSRTransposedreader.c)
+
+target_link_libraries(TestPatternMMCSRTransposedReader CSRTransposedLoader)
+add_test(TestPatternMMCSRTransposedReader TestPatternMMCSRTransposedReader)
 add_executable(TestPatternMMHLLReader testPatternMMHLLreader.c)
 
 target_link_libraries(TestPatternMMHLLReader HLLDirectLoader)
